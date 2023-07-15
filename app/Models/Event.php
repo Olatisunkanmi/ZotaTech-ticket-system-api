@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasOne};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasOne, HasMany};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Spatie\MediaLibrary\HasMedia;
@@ -75,5 +75,13 @@ class  Event extends Model implements HasMedia
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+
+    // Get tickets that belongs to Events 
+
+    public function ticket(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
     }
 }

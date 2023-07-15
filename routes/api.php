@@ -1,10 +1,11 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\{AuthController, UserController, EventController, RedirectController };
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\api\{AuthController, UserController, EventController, RedirectController, SearchController };
 
 /*
 |--------------------------------------------------------------------------
@@ -37,13 +38,17 @@ Route::prefix('v1')->group(function () {
 
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-        Route::post('users/{id}', [UserController::class, 'show'])->name('show');
+        Route::post('users/{id}', [UserController::class, 'show'])->name('showUserId');
 
         Route::get('events/{slug}', [EventController::class, 'slug'])->name('slug');
 
         Route::post('events/{id}', [EventController::class, 'show'])->name('show');
 
         Route::get('e/{shortlink}', [EventController::class, 'redirect'])->name('redirect');
+
+        Route::get('search/{events}', [SearchController::class, 'searchEvents'])->name('searchEvents');
+
+
 
     });
 
@@ -79,7 +84,7 @@ Route::prefix('v1')->group(function () {
         
         //Tickets Routes
     //Route to Create a new ticket for an event.
-    Route::post('/events/{event}/tickets', [TicketController::class, 'store'])->name('store');
+    Route::post('/events/{event}/tickets', [TicketController::class, 'store'])->name('storeTicket');
     
     //Route to show that a ticket belongs to a specific event or Retrieve details of a specific ticket of an event.
     Route::get('/events/{event}/tickets/{ticket}', [TicketController::class, 'validateEventTicket'])->name('validateEventTicket');
@@ -88,4 +93,7 @@ Route::prefix('v1')->group(function () {
     //Route to Delete a specific ticket.
     Route::delete('/events/{event}/tickets/{ticket}', [TicketController::class, 'deleteSpecificTicket'])->name('deleteSpecificTicket');
     });
+
+    // Search Tickets belonging to an events
+    Route::get('/search/events/{event}/{tickets}', [SearchController::class, 'searchTickets'])->name('searchTickets');
 });
