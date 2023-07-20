@@ -1,0 +1,23 @@
+H1 a{
+    font-size: 50px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s ease-in-out;
+    
+}
+body{
+    background-color:black;
+}
+
+H1 a:hover{
+    color:pink;
+}
+
+p{
+    font-size: 30px;
+    color: white;
+}
+p a{
+    text-decoration: none;
+}
+

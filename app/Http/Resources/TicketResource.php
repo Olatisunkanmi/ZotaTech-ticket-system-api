@@ -17,9 +17,8 @@ class TicketResource extends JsonResource
         return[
             'event_id'=>$this->event_id,
             'ticket_type'=>$this->ticket_type,
-            'price'=>$this->price,
+            'amount'=>$this->amount,
             'quantity'=>$this->quantity,
-            'available'=>$this->available,
         ];
     }
 }

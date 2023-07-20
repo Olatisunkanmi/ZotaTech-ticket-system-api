@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Events\GuestSignup;
 use App\Helper\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -40,6 +41,8 @@ class AuthController extends Controller
     {
         // Logic for handling user registration
         $user = User::create($request->validated());
+
+        event(new GuestSignup($user));
 
         return response()->json([
             'message' => 'User created successfully',

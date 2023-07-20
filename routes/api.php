@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\{AuthController, UserController, EventController, TicketController, CategoryController, OrderController};
+use App\Http\Controllers\api\{AuthController, UserController, EventController, PaymentController, RedirectController, TicketController, CategoryController, OrderController};
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
 
@@ -23,7 +23,10 @@ Route::prefix('v1')->group(function () {
     /// Declare the heartbeat route for the API
     Route::any('/', function () {
         return response()->json(['message' => 'Welcome to Open Tickets Apis'], 200);
-    });
+    })->name('welcome');
+
+
+
 
 
 
@@ -36,8 +39,6 @@ Route::prefix('v1')->group(function () {
         Route::post('login', [AuthController::class, 'login'])->name('login');
 
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-
-        Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
 
         Route::post('users/{id}', [UserController::class, 'show'])->name('show');
 
@@ -52,6 +53,10 @@ Route::prefix('v1')->group(function () {
         Route::post('categories/{id}', [CategoryController::class, 'show'])->name('show');
 
         Route::get('categories/{slug}', [CategoryController::class, 'slug'])->name('slug');
+
+        Route::get('verifyTransaction', [PaymentController::class, 'verifyTransaction'])->name('verifyTransaction');
+
+        Route::get('tickets/{id}', [TicketController::class, 'show']);
     });
 
 
@@ -59,9 +64,7 @@ Route::prefix('v1')->group(function () {
     Route::group(['middleware' => 'auth:api'], static function () {
 
         //User routes
-        Route::prefix('users')->middleware(['user.auth'])->group(function () {
-
-
+        Route::prefix('users')->middleware(['role:user'])->group(function () {
             Route::delete('/{id}', [UserController::class, 'destroy'])->name('index');
             Route::put('/{id}', [UserController::class, 'update'])->name(' update');
         });
@@ -75,6 +78,8 @@ Route::prefix('v1')->group(function () {
 
             Route::apiResource('categories', CategoryController::class);
             Route::post('categories/{id}', [CategoryController::class, 'show'])->name('show');
+
+            Route::get('/tickets', [TicketController::class, 'index']);
         });
 
 
@@ -83,21 +88,22 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [EventController::class, 'store'])->name('store');
 
 
-            Route::group(['middleware' => 'owner'], function () {
+            Route::group(['middleware' => 'isOwner'], function () {
                 Route::put('/{id}', [EventController::class, 'update'])->name('update');
                 Route::delete('/{id}', [EventController::class, 'destroy'])->name('destroy');
             });
         });
 
-        //Tickets Routes
-        //Route to Create a new ticket for an event.
-        Route::post('/events/{event}/tickets', [TicketController::class, 'store'])->name('store');
+        //Tickets Route
+        Route::prefix('tickets')->group(function () {
+            Route::post('/', [TicketController::class, 'store'])->name('store');
+            Route::post('pay', [PaymentController::class, 'makePayment'])->name('pay');
 
-        //Route to show that a ticket belongs to a specific event or Retrieve details of a specific ticket of an event.
-        Route::get('/events/{event}/tickets/{ticket}', [TicketController::class, 'validateEventTicket'])->name('validateEventTicket');
-        // Route to Update details of a specific ticket of an event.
-        Route::put('/events/{event}/tickets/{ticket}', [TicketController::class, 'updatespecificticket'])->name('updateSpecificTicket');
-        //Route to Delete a specific ticket.
-        Route::delete('/events/{event}/tickets/{ticket}', [TicketController::class, 'deleteSpecificTicket'])->name('deleteSpecificTicket');
+
+            Route::group(['middleware' => 'ticketOwner'], function () {
+                Route::put('/{id}', [TicketController::class, 'update'])->name('update');
+                Route::delete('/{id}', [TicketController::class, 'destroy'])->name('destroy');
+            });
+        });
     });
 });

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BookTicket;
 use App\Models\Booking;
+use App\Models\User;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
@@ -27,6 +30,7 @@ class BookingController extends Controller
 
         $booking = Booking::create($validatedData);
         $booking->tickets()->attach($validatedData['tickets']);
+        
 
         return response()->json(['data' => $booking], 201);
     }
