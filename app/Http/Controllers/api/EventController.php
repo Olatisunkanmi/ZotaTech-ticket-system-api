@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Helper\Helper;
-use App\Models\{Event, Url};
+use App\Models\{Event, Url, Category};
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\EventResources;
@@ -106,7 +106,19 @@ class EventController extends Controller
     public function store(EventRequest $request)
     {
 
-        $data = Event::create(array_merge($request->validated(), ['user_id' => Auth::user()->id]));
+        $data = Event::create(array_merge(
+            $request->validated(),
+            [
+                'user_id' => Auth::user()->id,
+            ]
+        ));
+
+
+        $category = Category::where('name', $request->category)->first();
+
+
+        $category->attachEvents($data->id);
+
 
         if ($request->hasFile('image') && !empty($request->image)) {
             $data->addMediaFromRequest('image')->toMediaCollection('image');

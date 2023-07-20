@@ -21,6 +21,7 @@ class EventResources extends JsonResource
             'attributes' => [
                 'title' => $this->title,
                 'description' => $this->description,
+                'category' => $this->category,
                 'image' => [
                     'file_name' => $this->image->file_name,
                     'mine_type' => $this->image->mime_type,
@@ -39,6 +40,7 @@ class EventResources extends JsonResource
                 'user_id' => $this->user_id,
             ],  
                 'url' => $this->url,
+                'category' => $this->category,
         ];
     }
 }

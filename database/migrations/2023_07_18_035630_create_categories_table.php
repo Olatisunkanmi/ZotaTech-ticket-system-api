@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            //
-            // $table->foreignUlid('url_id')->constrained('urls')->onDelete('cascade');
+        Schema::create('categories', function (Blueprint $table) {
+            $table->ulid('id')->primary()->uniqid();
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
@@ -22,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('categories');
     }
 };

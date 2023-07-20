@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\{AuthController, UserController, EventController, TicketController};
+use App\Http\Controllers\api\{AuthController, UserController, EventController, TicketController, CategoryController, OrderController};
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
 
@@ -48,6 +48,10 @@ Route::prefix('v1')->group(function () {
         Route::post('events/{id}', [EventController::class, 'show'])->name('show');
 
         Route::get('e/{shortlink}', [EventController::class, 'redirect'])->name('redirect');
+
+        Route::post('categories/{id}', [CategoryController::class, 'show'])->name('show');
+
+        Route::get('categories/{slug}', [CategoryController::class, 'slug'])->name('slug');
     });
 
 
@@ -68,6 +72,9 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('users', UserController::class)->except(['update', 'destroy']);
 
             Route::apiResource('events', EventController::class)->except(['show', 'slug', 'redirect']);
+
+            Route::apiResource('categories', CategoryController::class);
+            Route::post('categories/{id}', [CategoryController::class, 'show'])->name('show');
         });
 
 

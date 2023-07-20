@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasOne};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasOne};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Spatie\MediaLibrary\HasMedia;
@@ -57,6 +57,14 @@ class  Event extends Model implements HasMedia
     }
 
 
+    /**
+     * Get the user that owns the event.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
 
     /**
      * Get the url details for the event.
@@ -67,14 +75,12 @@ class  Event extends Model implements HasMedia
         return $this->hasOne(Url::class);
     }
 
-    /**
-     * Get the user that owns the event.
-     */
-    public function user(): BelongsTo
+    public function category(): BelongsToMany
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(Category::class, 'category_event', 'event_id', 'category_id');
     }
 
+ 
 
     public static function booted()
     {

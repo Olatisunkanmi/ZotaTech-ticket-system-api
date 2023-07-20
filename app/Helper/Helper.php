@@ -3,6 +3,7 @@
 namespace App\Helper;
 
 use Illuminate\Support\Str;
+use App\Models\{Event, Url, Category};
 use Illuminate\Support\Facades\{Http, Cache};
 
 
@@ -132,5 +133,10 @@ class Helper
     public static function generateToken()
     {
         return Str::random(6);
+    }
+
+    public static function getCategoryId($name){
+        $category = Category::where('name', $name)->first();
+        return $category->id;
     }
 }
