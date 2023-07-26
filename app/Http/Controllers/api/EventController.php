@@ -200,4 +200,32 @@ class EventController extends Controller
             return response()->json(['message' => 'Event not found'], 404);
         }
     }
+
+    public function searchEvents(Request $request) 
+    {
+        $event = Event::query();
+
+        if ($request->has('description')) {
+            $description = $request->input('description');
+            $event->where('description', 'like', '%' .$description. '%');
+        }
+
+        if ($request->has('location')) {
+            $location = $request->input('location');
+            $event->where('location', 'like', '%' .$location. '%');
+        }
+
+        if ($request->has('category')) {
+            $category = $request->input('category');
+            $event->where('category', 'like', '%' .$category. '%');
+        }
+
+        $filteredEvents = $event->get();
+
+        return response()->json([
+            'message' => 'Searched events listed successfully',
+            'data' => EventResources::collection($filteredEvents)
+        ]);
+    }
+
 }
