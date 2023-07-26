@@ -6,18 +6,19 @@ use App\Events\BookTicket;
 use App\Models\Booking;
 use App\Models\User;
 use App\Models\Ticket;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $bookings = Booking::all();
 
         return response()->json(['data' => $bookings]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -35,12 +36,12 @@ class BookingController extends Controller
         return response()->json(['data' => $booking], 201);
     }
 
-    public function show(Booking $booking)
+    public function show(Booking $booking): JsonResponse
     {
         return response()->json(['data' => $booking]);
     }
 
-    public function destroy(Booking $booking)
+    public function destroy(Booking $booking): JsonResponse
     {
         $booking->tickets()->detach();
         $booking->delete();

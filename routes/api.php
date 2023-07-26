@@ -27,9 +27,6 @@ Route::prefix('v1')->group(function () {
 
 
 
-
-
-
     // Declare unauthenticated routes
     Route::group(['middleware' => 'guest'], function () {
 

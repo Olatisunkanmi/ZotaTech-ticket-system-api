@@ -20,6 +20,8 @@ class AuthController extends Controller
         // Logic for handling user login
         $user = User::where('email', $request->email)->first();
 
+
+
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'message' => 'Invalid credentials'
@@ -28,7 +30,7 @@ class AuthController extends Controller
 
         $token = $user->generateUserRole();
 
-        Cache::put('user' . $user->id, $user, now()->addHour(1));
+        Cache::put('user' . $user->id, $user, now()->addHour());
 
         return response()->json([
             'message' => 'User logged in successfully',
@@ -52,8 +54,7 @@ class AuthController extends Controller
 
     public function logout(): JsonResponse
     {
-
-        Cache::forget('user' . auth()->user()->id);
+        Cache::forget('user');
         // Logic for handling user logout
         auth()->logout();
 

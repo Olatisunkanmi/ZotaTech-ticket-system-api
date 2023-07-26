@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\EventResources;
 use App\Http\Requests\EventRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\{Auth, Cache};
 
 class EventController extends Controller
@@ -16,10 +17,13 @@ class EventController extends Controller
      * Get all events.
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): JsonResponse
     {
         try {
-            $events = Helper::saveToCache('events', Event::latest()->paginate(), now()->addHour(1));
+
+            $time = now()->addHour();
+
+            $events = Helper::saveToCache('events', Event::latest()->paginate(), $time);
 
 
 
@@ -29,11 +33,13 @@ class EventController extends Controller
             ], 200);
         } catch (\Throwable $th) {
 
-            return response()->json(['message' => 'Events not found'], 404);
+            return response()->json([
+                'message' => 'Events not found'
+            ], 404);
         }
     }
 
-    public function slug(string $slug)
+    public function slug(string $slug): JsonResponse
     {
         try {
             //code...
@@ -41,7 +47,9 @@ class EventController extends Controller
             $data = Url::where('short_id', $url_id)->first();
 
             if (!$data) {
-                return response()->json(['message' => 'Event not found'], 404);
+                return response()->json([
+                    'message' => 'Event not found'
+                ], 404);
             }
 
             $id = $data->event_id;
@@ -54,7 +62,7 @@ class EventController extends Controller
             }
 
             Helper::updateEventClicks($event);
-            Helper::updateCache('events', $event->id, $event, now()->addHour(1));
+            Helper::updateCache('events', $event->id, $event, now()->addHour());
 
             return response()->json([
                 'message' => 'Event retrieved successfully',
@@ -62,7 +70,9 @@ class EventController extends Controller
             ], 200);
         } catch (\Throwable $th) {
             //throw $th;
-            return response()->json(['message' => 'Event not found'], 404);
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         }
     }
 
@@ -73,7 +83,7 @@ class EventController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
         try {
             $cachedEvent = Helper::getFromCache('events', $id);
@@ -82,19 +92,21 @@ class EventController extends Controller
                 $event = $cachedEvent;
             } else {
                 $event = Event::findOrFail($id);
-                $event = Helper::saveToCache('events' . $event->id, $event, now()->addHour(1));
+                $event = Helper::saveToCache('events' . $event->id, $event, now()->addHour());
             }
 
             Helper::updateEventClicks($event);
-            Helper::updateCache('events', $event->id, $event, now()->addHour(1));
+            Helper::updateCache('events', $event->id, $event, now()->addHour());
 
             return response()->json([
                 'message' => 'Event retrieved successfully',
                 'data' => new EventResources($event)
             ], 200);
         } catch (\Throwable $th) {
-            //throw $th;
-            return response()->json(['message' => 'Event not found'], 404);
+
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         }
     }
     /**
@@ -103,7 +115,7 @@ class EventController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function store(EventRequest $request)
+    public function store(EventRequest $request): JsonResponse
     {
 
         $data = Event::create(array_merge(
@@ -141,7 +153,9 @@ class EventController extends Controller
         $url = Url::where('short_id', $short_id)->first();
 
         if (!$url) {
-            return response()->json(['message' => 'Url not found'], 404);
+            return response()->json([
+                'message' => 'Url not found'
+            ], 404);
         }
 
         return redirect($url->long_url);
@@ -154,7 +168,7 @@ class EventController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
         try {
             //code...
@@ -167,7 +181,7 @@ class EventController extends Controller
             }
 
             $event->update($request->all());
-            Helper::updateCache('events', $id, $event, now()->addHour(1));
+            Helper::updateCache('events', $id, $event, now()->addHour());
 
 
             return response()->json([
@@ -176,7 +190,9 @@ class EventController extends Controller
             ], 201);
         } catch (\Throwable $th) {
             //throw $th;
-            return response()->json(['message' => 'Event not found'], 404);
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         }
     }
 
@@ -187,7 +203,7 @@ class EventController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         try {
             //code...
@@ -205,11 +221,15 @@ class EventController extends Controller
                 }
             }
 
-            return response()->json(['message' => 'Event deleted successfully'], 200);
+            return response()->json([
+                'message' => 'Event deleted successfully'
+            ], 200);
         } catch (\Throwable $th) {
             //throw $th;
 
-            return response()->json(['message' => 'Event not found'], 404);
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         }
     }
 }
