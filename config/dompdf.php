@@ -169,7 +169,7 @@ return array(
          *
          * @see CPDF_Adapter::PAPER_SIZES for valid sizes ('letter', 'legal', 'A4', etc.)
          */
-        "default_paper_size" => "a5",
+        "default_paper_size" => "a4",
 
          /**
           * The default paper orientation.
@@ -178,7 +178,7 @@ return array(
           *
           * @var string
           */
-        'default_paper_orientation' => "landscape",
+        'default_paper_orientation' => "portrait",
 
         /**
          * The default font family

@@ -17,3 +17,4 @@ Route::get('/', function () {
     return redirect( '/api/v1') ;
 });
 
+Route::get('/ticket', [PDFController::class, 'index']);

@@ -73,7 +73,7 @@
 
     .qr-code {
       text-align: center;
-      padding-left: 32%;
+      padding-left: 25%;
       height: 10px;
       margin: 0px;
     }
@@ -111,7 +111,7 @@
     </div>
     <div class="barcode">
       <p>ID: <a style="text-decoration: none; font: san-serif; color: black; text-transform:uppercase" href="{{$link}}">{{$id}}</a> </p>
-      <div class="qr-code">{!! DNS2D::getBarcodeHTML('{{$link}}', 'QRCODE') !!}</div>
+      <div class="qr-code"> {!! DNS2D::getBarcodeHTML( "{{$link}}" , 'QRCODE') !!}</div>
 
       <!-- <footer class="footer_text"> -->
       <!-- <h6>© 2023 ZojaTix - All Rights Reserved.</h6> -->
