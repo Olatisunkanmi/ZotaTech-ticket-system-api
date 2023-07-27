@@ -59,9 +59,9 @@ class BookingMail extends Mailable
     {
         $data =[
             'name'=> $this->user->name,
-            'event' => $this->ticket->event->title,
-            'date' => $this->ticket->event->start_date,
-            'time' => $this->ticket->event->time,
+            'event' => $this->ticket->event?->title,
+            'date' => $this->ticket->event?->start_date,
+            'time' => $this->ticket->event?->time,
             'quantity' => $this->ticket->quantity,
             'id' => $this->ticket->id,
             'eventOwner'=>$this->ticket->event->user->name,

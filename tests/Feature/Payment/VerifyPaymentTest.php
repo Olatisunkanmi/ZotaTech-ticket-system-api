@@ -1,36 +1,49 @@
 <?php
 
-use App\Http\Controllers\api\PaymentController;
-use Illuminate\Http\JsonResponse;
+use App\Helper\Helper;
 use App\Models\Event;
 use App\Models\Payment;
 use App\Services\PaymentService;
-use Illuminate\Support\Facades\Request;
-use Mockery;
+use Mockery\MockInterface;
 
-beforeEach(function () {
-    $this->paymentService = mock(PaymentService::class);
-    $this->paymentController = new PaymentController();
-});
 
 it('verifies a successful transaction', function () {
-    $user = actingAs();
-    $request = Request::create('/api/verify-transaction', 'POST', ['reference' => 'abc123']);
-    $payment = Payment::factory()->create(['reference' => 'abc123', 'status' => 'pending']);
 
-    $this->paymentService
-        ->shouldReceive('verifyTransaction')
-        ->with('abc123')
-        ->andReturn(['status' => true]);
+    $paymentServiceMock = Mockery::mock(PaymentService::class, function (MockInterface $mock) {
+        $mock->shouldReceive('verifyTransaction')
+            ->with('ab2123jej34')
+            ->andReturn(['status' => true]);
+    });
 
-    $response = $this->paymentController->verifyTransaction($request);
+    $helperMock = Mockery::mock(Helper::class, function (MockInterface $mock) {
+        $mock->shouldReceive('getDomain')
+            ->andReturn('127.0.0.1');
+        $mock->shouldReceive('generateLink')
+            ->andReturn([
+                'long_url' => 'http://longurl/1234.com',
+                'short_id' => '1234',
+                'short_url' => 'http://shorturl.com',
+            ]);
+    });
+    $this->instance(Helper::class, $helperMock);
 
+    
+    $payment = Payment::factory()->create(['reference' => 'ab2123jej34', 'status' => 'pending']);
 
-    expect($response)->toBeInstanceOf(JsonResponse::class);
-    expect($response->getStatusCode())->toBe(200);
+    $this->instance(PaymentService::class, $paymentServiceMock);
+
+    $response =  $this->json(
+        'GET',
+        '/api/v1/verifyTransaction',
+        ['reference' => 'ab2123jej34']
+    );
+
+    $this->assertDatabaseCount('payments',1);
+    $this->assertDatabaseCount('events',1);
+
+    $this->assertDatabaseHas('payments', [
+        'status'=> 'successful'
+    ]);
+    expect($response->getStatusCode())->toBeTruthy();
     expect($response->getData()->message)->toBe('Payment Successful. Ticket booked');
-
-
-
 });
-

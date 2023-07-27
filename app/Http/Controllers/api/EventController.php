@@ -17,11 +17,6 @@ class EventController extends Controller
 {
     
     public function index(): JsonResponse
-    /**
-     * Get all events.
-     * @return \Illuminate\Http\Response
-     */
-    public function index(): JsonResponse
     {
         try {
             $events = Helper::saveToCache('events', Event::latest()->paginate(), now()->addHour());
@@ -207,32 +202,4 @@ class EventController extends Controller
             ], 404);
         }
     }
-
-    public function searchEvents(Request $request): JsonResponse
-    {
-        $event = Event::query();
-
-        if ($request->has('description')) {
-            $description = $request->input('description');
-            $event->where('description', 'like', '%' .$description. '%');
-        }
-
-        if ($request->has('location')) {
-            $location = $request->input('location');
-            $event->where('location', 'like', '%' .$location. '%');
-        }
-
-        if ($request->has('category')) {
-            $category = $request->input('category');
-            $event->where('category', 'like', '%' .$category. '%');
-        }
-
-        $filteredEvents = $event->get();
-
-        return response()->json([
-            'message' => 'Searched events listed successfully',
-            'data' => EventResources::collection($filteredEvents)
-        ]);
-    }
-
 }

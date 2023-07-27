@@ -16,7 +16,7 @@ return new class extends Migration
             $table->dropColumn('user_id');
         });
         Schema::table('oauth_access_tokens', function (Blueprint $table) {
-            $table->uuid('user_id')->index()->nullable();
+            $table->ulid('user_id')->index()->nullable();
         });
     }
 

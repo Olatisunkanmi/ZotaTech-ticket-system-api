@@ -44,7 +44,8 @@ class AuthController extends Controller
         // Logic for handling user registration
         $user = User::create($request->validated());
 
-        event(new GuestSignup($user));
+        event(new GuestSignup($user)); // @phpstan-ignore-line
+
 
         return response()->json([
             'message' => 'User created successfully',

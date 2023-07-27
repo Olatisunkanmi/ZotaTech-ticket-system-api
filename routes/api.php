@@ -45,7 +45,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('events/{slug}', [EventController::class, 'slug'])->name('slug');
 
-        Route::post('events/{id}', [EventController::class, 'show'])->name('show');
+        Route::post('events/{id}', [EventController::class, 'show'])->name('showEvent');
 
         Route::get('e/{shortlink}', [EventController::class, 'redirect'])->name('redirect');
 
@@ -56,6 +56,10 @@ Route::prefix('v1')->group(function () {
         Route::get('verifyTransaction', [PaymentController::class, 'verifyTransaction'])->name('verifyTransaction');
 
         Route::get('tickets/{id}', [TicketController::class, 'show']);
+        Route::get('search/events/filter', [EventController::class, 'searchEvents'])->name('searchEvent');
+
+        Route::get('search/tickets/filter', [TicketController::class, 'searchTickets'])->name('searchTicket'); 
+
     });
 
 
@@ -64,7 +68,7 @@ Route::prefix('v1')->group(function () {
 
         //User routes
         Route::prefix('users')->middleware(['role:user'])->group(function () {
-            Route::delete('/{id}', [UserController::class, 'destroy'])->name('index');
+            Route::delete('/{id}', [UserController::class, 'destroy'])->name('indexUser');
             Route::put('/{id}', [UserController::class, 'update'])->name(' update');
         });
 
@@ -88,13 +92,13 @@ Route::prefix('v1')->group(function () {
 
 
             Route::group(['middleware' => 'isOwner'], function () {
-                Route::put('/{id}', [EventController::class, 'update'])->name('update');
-                Route::delete('/{id}', [EventController::class, 'destroy'])->name('destroy');
+                Route::put('/{id}', [EventController::class, 'update'])->name('updateTicket');
+                Route::delete('/{id}', [EventController::class, 'destroy'])->name('destroyTicket');
             });
         });
 
         //Tickets Route
-        Route::prefix('tickets')->group(function () {
+        Route::prefix('tickets')->group(function (){
             Route::post('/', [TicketController::class, 'store'])->name('store');
             Route::post('pay', [PaymentController::class, 'makePayment'])->name('pay');
 

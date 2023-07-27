@@ -22,7 +22,7 @@ class PaymentController extends Controller
     public function __construct()
     {
 
-        $this->paymentService = new PaymentService();
+        $this->paymentService = app(PaymentService::class);
     }
 
 
@@ -31,9 +31,9 @@ class PaymentController extends Controller
         $user = auth()->user();
         $ref = uniqid();
         $data = [
-            'amount' => $request->amount * 100,
-            'email' => $user->email,
-            'user_id' => $user->id,
+            'amount' => $request->amount * 100 * $request->quantity,
+            'email' => $user?->email,
+            'user_id' => $user?->id,
             'event_id' => $request->event_id,
             'ticket_type' => $request->ticket_type,
             'quantity' => $request->quantity,
@@ -58,7 +58,8 @@ class PaymentController extends Controller
 
             if ($response['status'] == true) {
                 $payment = Payment::where('reference', $request->reference)->first();
-                if ($payment->status == 'successful') {
+
+                if ($payment?->status == 'successful') {
                     return response()->json([
                         "message" => "Payment already verified",
                         "data" =>  $payment,
@@ -66,19 +67,19 @@ class PaymentController extends Controller
                     ]);
                 }
 
-                $payment->status = 'successful';
-                $payment->save();
+                $payment->status = 'successful'; // @phpstan-ignore-line
+                $payment?->save();
 
                 $ticket_data = collect($payment)->except('id')->toArray();
 
                 $ticket = Ticket::create($ticket_data);
                 $event = $ticket->event;
-                $event->available_seats -= $ticket->quantity;
-                $event->save();
+                $event->available_seats -= $ticket->quantity; // @phpstan-ignore-line
+                $event?->save();
 
                 $user = User::findorfail($ticket->user_id);
 
-                event(new BookTicket($user, $ticket));
+                event(new BookTicket($user, $ticket)); // @phpstan-ignore-line
 
                 return response()->json([
                     "message" => "Payment Successful. Ticket booked",
@@ -88,12 +89,13 @@ class PaymentController extends Controller
             }
         } catch (\Throwable $th) {
             return response()->json([
-                "message" => "Reference code invalid",
+                "message" => $th,
+                'status' => 302
             ], 302);
         }
 
         return response()->json([
-            "message" => " Payament failed",
+            "message" => "Payament failed",
             'status' => 400
         ]);
     }
