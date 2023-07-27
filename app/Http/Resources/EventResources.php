@@ -8,39 +8,39 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EventResources extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+    /** 
+     * @mixin Event
+     * @extends JsonResource<Event>
+     **/
+    public function toArray($request)
     {
+
+
         return [
-            'id' => $this->id,
+            'id' => $this->resource->id,
             'type' => 'events',
             'attributes' => [
-                'title' => $this->title,
-                'description' => $this->description,
+                'title' => $this->resource->title,
+                'description' => $this->resource->description,
                 'category' => $this->category,
                 'image' => [
-                    'file_name' => $this->image->file_name,
-                    'mine_type' => $this->image->mime_type,
-                    'file_size' => $this->image->size,
-                    'image_url' => $this->image->original_url,
+                    'file_name' => $this->resource->image->file_name,
+                    'mime_type' => $this->resource->image->mime_type,
+                    'file_size' => $this->resource->image->size,
+                    'image_url' => $this->resource->image->original_url,
                 ],
-                'date' => $this->date,
-                'time' => $this->time,
-                'type' => $this->type,
-                'price' => $this->price,
-                'capacity' => $this->capacity,
-                'available_seats' => $this->available_seats,
-                'location' => $this->location,
-                'start_date' => $this->start_date,
-                'end_date' => $this->end_date,
-                'user_id' => $this->user_id,
-            ],  
-                'url' => $this->url,
-                'category' => $this->category,
+                'date' => $this->resource->date,
+                'time' => $this->resource->time,
+                'type' => $this->resource->type,
+                'price' => $this->resource->price,
+                'capacity' => $this->resource->capacity,
+                'available_seats' => $this->resource->available_seats,
+                'location' => $this->resource->location,
+                'start_date' => $this->resource->start_date,
+                'end_date' => $this->resource->end_date,
+                'user_id' => $this->resource->user_id,
+            ],
+            'url' => $this->resource->url,
         ];
     }
 }

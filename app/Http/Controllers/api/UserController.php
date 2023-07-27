@@ -14,13 +14,13 @@ class UserController extends Controller
 
     /**
      * Get all users.
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
         try {
             //code...
-            $users = Helper::saveToCache('users', User::all(), now()->addHour(1));
+            $users = Helper::saveToCache('users', User::all(), now()->addHour());
 
             return response()->json([
                 'message' => 'User index',
@@ -36,9 +36,9 @@ class UserController extends Controller
     /**
      * Get a specific user.
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show(string $id)
     {
         try {
             //code...
@@ -47,7 +47,7 @@ class UserController extends Controller
 
             if (!$user) {
                 $user = User::findOrFail($id);
-                $user = Helper::saveToCache('users', $id, now()->addHour(1));
+                $user = Helper::saveToCache('users', $id, now()->addHour());
             }
 
             return response()->json([
@@ -66,9 +66,9 @@ class UserController extends Controller
      * Update the specified user in storage.
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request,string $id)
     {
         try {
             // Retrieve the user from the cache if available
@@ -82,7 +82,7 @@ class UserController extends Controller
             }
 
             $user->update($request->all());
-            Helper::updateCache('users', $id, $user, now()->addHour(1));
+            Helper::updateCache('users', $id, $user, now()->addHour());
 
 
             return response()->json([
@@ -98,9 +98,9 @@ class UserController extends Controller
     /**
      * Remove the specified user from storage.
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
         try {
             //code...

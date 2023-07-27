@@ -8,11 +8,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\EventResources;
 use App\Http\Requests\EventRequest;
+use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\{Auth, Cache};
+use Illuminate\Support\Js;
 
 class EventController extends Controller
 {
+    
+    public function index(): JsonResponse
     /**
      * Get all events.
      * @return \Illuminate\Http\Response
@@ -20,10 +24,7 @@ class EventController extends Controller
     public function index(): JsonResponse
     {
         try {
-
-            $time = now()->addHour();
-
-            $events = Helper::saveToCache('events', Event::latest()->paginate(), $time);
+            $events = Helper::saveToCache('events', Event::latest()->paginate(), now()->addHour());
 
 
 
@@ -77,12 +78,6 @@ class EventController extends Controller
     }
 
 
-    /**
-     * Get a specific event.
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
-     */
-
     public function show(string $id): JsonResponse
     {
         try {
@@ -109,12 +104,7 @@ class EventController extends Controller
             ], 404);
         }
     }
-    /**
-     * Create a new event.
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-
+   
     public function store(EventRequest $request): JsonResponse
     {
 
@@ -142,13 +132,9 @@ class EventController extends Controller
         ], 201);
     }
 
-    /**
-     * Redirect to the specified event.
-     * @param  string  $short_id
-     * @return \Illuminate\Http\Response
-     */
+   
 
-    public function redirect($short_id)
+    public function redirect($short_id): JsonResponse
     {
         $url = Url::where('short_id', $short_id)->first();
 
@@ -161,13 +147,7 @@ class EventController extends Controller
         return redirect($url->long_url);
     }
 
-    /**
-     * Update the specified event in storage.
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
-     */
-
+    
     public function update(Request $request, string $id): JsonResponse
     {
         try {
@@ -197,12 +177,7 @@ class EventController extends Controller
     }
 
 
-    /**
-     * Remove the specified event from storage.
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
-     */
-
+  
     public function destroy(string $id): JsonResponse
     {
         try {
@@ -232,4 +207,32 @@ class EventController extends Controller
             ], 404);
         }
     }
+
+    public function searchEvents(Request $request): JsonResponse
+    {
+        $event = Event::query();
+
+        if ($request->has('description')) {
+            $description = $request->input('description');
+            $event->where('description', 'like', '%' .$description. '%');
+        }
+
+        if ($request->has('location')) {
+            $location = $request->input('location');
+            $event->where('location', 'like', '%' .$location. '%');
+        }
+
+        if ($request->has('category')) {
+            $category = $request->input('category');
+            $event->where('category', 'like', '%' .$category. '%');
+        }
+
+        $filteredEvents = $event->get();
+
+        return response()->json([
+            'message' => 'Searched events listed successfully',
+            'data' => EventResources::collection($filteredEvents)
+        ]);
+    }
+
 }

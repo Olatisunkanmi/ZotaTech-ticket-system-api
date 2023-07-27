@@ -39,6 +39,8 @@ Route::prefix('v1')->group(function () {
 
         Route::post('users/{id}', [UserController::class, 'show'])->name('show');
 
+        Route::post('users/{id}/events', [EventController::class, 'events'])->name('viewEventsByUserId');
+
         Route::get('events', [EventController::class, 'index'])->name('index');
 
         Route::get('events/{slug}', [EventController::class, 'slug'])->name('slug');
@@ -102,5 +104,8 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}', [TicketController::class, 'destroy'])->name('destroy');
             });
         });
+        
+        //Search routes
+  
     });
 });

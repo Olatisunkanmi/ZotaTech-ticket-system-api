@@ -15,16 +15,16 @@ class UserResources extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => strval($this->id),
+            'id' => strval($this->resource->id),
             'type' => 'users',
             'attributes' => [
-                'name' => $this->name,
-                'email' => $this->email,
-                'phone_number' => $this->phone_number,
-                'created_at' => $this->created_at,
-                'updated_at' => $this->updated_at,
+                'name' => $this->resource->name,
+                'email' => $this->resource->email,
+                'phone_number' => $this->resource->phone_number,
+                'created_at' => $this->resource->created_at,
+                'updated_at' => $this->resource->updated_at,
             ],
-            'events' => collect($this->events)->map(function ($event) {
+            'events' => collect($this->resource->events)->map(function ($event) {
                 return new EventResources($event);
             }),
         ];
