@@ -1,13 +1,53 @@
-version: '3.8'
+version: '3'
 services:
-  database:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: '@Olasunkanmi1'
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Replace with the name of your Dockerfile if it's not named "Dockerfile"
+    container_name: ticketing_app
+    restart: unless-stopped
     ports:
-      - 3306:3306
+      - "8000:80"  # Map port 8000 on the host to port 80 on the container (adjust as needed)
     volumes:
-      - mysql_compose_volume:/var/lib/mysql
+      - ./:/var/www/html
+    environment:
+      - APP_NAME=<YOUR_ENV_VARIABLES>  # Add any other environment variables needed for your Laravel app
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: mysql:latest
+    container_name: ticket-mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    container_name: ticket_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  Nginx:
+    image: nginx:alpine
+    container_name: ticket_nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      - app
 
 volumes:
-  mysql_compose_volume: ~
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
