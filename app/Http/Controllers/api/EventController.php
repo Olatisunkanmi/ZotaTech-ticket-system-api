@@ -102,20 +102,13 @@ class EventController extends Controller
    
     public function store(EventRequest $request): JsonResponse
     {
-
-        $data = Event::create(array_merge(
-            $request->validated(),
-            [
-                'user_id' => Auth::user()->id,
-            ]
-        ));
-
-
-        $category = Category::where('name', $request->category)->first();
-
-
-        $category->attachEvents($data->id);
-
+        $user =auth()->user();
+        if($user->subaccount_code == null){
+            return response()->json([
+                'message' => 'Update account details before creating event',
+            ],419);
+        };
+        $data = Event::create(array_merge($request->validated(), ['user_id' => Auth::user()->id]));
 
         if ($request->hasFile('image') && !empty($request->image)) {
             $data->addMediaFromRequest('image')->toMediaCollection('image');

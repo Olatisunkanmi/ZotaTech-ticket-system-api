@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Events\BookTicket;
 use App\Http\Requests\PaymentRequest;
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use App\Models\Payment;
 use App\Models\Ticket;
 use App\Models\User;
@@ -29,6 +30,7 @@ class PaymentController extends Controller
     public function makePayment(PaymentRequest $request): JsonResponse
     {
         $user = auth()->user();
+        $event = Event::findOrFail($request->event_id);
         $ref = uniqid();
         $data = [
             'amount' => $request->amount * 100 * $request->quantity,
@@ -37,6 +39,8 @@ class PaymentController extends Controller
             'event_id' => $request->event_id,
             'ticket_type' => $request->ticket_type,
             'quantity' => $request->quantity,
+            'subaccount'=> $event->user->subaccount_code,
+            'bearer'=> 'subaccount',
             'reference' => $ref,
             'callback_url' => route('verifyTransaction')
         ];

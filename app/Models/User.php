@@ -31,7 +31,8 @@ class User extends Authenticatable implements HasMedia
         'name',
         'email',
         'password',
-        'confirm_password'
+        'confirm_password',
+        'subaccount_code'
     ];
 
     /**
