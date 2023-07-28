@@ -24,7 +24,7 @@ class UserController extends Controller
             $users = Helper::saveToCache('users', User::all(), now()->addHour());
 
             return response()->json([
-                'message' => 'User index',
+                'message' => 'Retrieved successfully',
                 'data' => $users
             ], 200);
         } catch (\Throwable $th) {
@@ -43,7 +43,7 @@ class UserController extends Controller
     {
         try {
             //code...
-            $user = Helper::getFromCache('users', $id);
+            $user = Helper::getFromCache('user', $id);
 
 
             if (!$user) {
@@ -52,8 +52,8 @@ class UserController extends Controller
             }
 
             return response()->json([
-                'message' => 'User show',
-                'data' => new UserResources($user)
+                'message' => 'User Found',
+                'data' => $user
             ], 200);
         } catch (\Throwable $th) {
             //throw $th;
@@ -69,7 +69,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request,string $id)
+    public function update(Request $request, string $id)
     {
         try {
             // Retrieve the user from the cache if available
@@ -149,6 +149,25 @@ class UserController extends Controller
         } catch (\Throwable $th) {
             //throw $th;
 
+            return response()->json(['message' => 'User not found'], 404);
+        }
+    }
+
+    public function getEvents(string $id)
+    {
+        try {
+            //code...
+
+            $user = User::findOrFail($id);
+            $events = $user->events;
+
+            return response()->json([
+                'message' => 'Retrieved successfully',
+                'data' => $events
+            ], 200);
+
+        } catch (\Throwable $th) {
+            //throw $th;
             return response()->json(['message' => 'User not found'], 404);
         }
     }

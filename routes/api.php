@@ -37,21 +37,21 @@ Route::prefix('v1')->group(function () {
 
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-        Route::post('users/{id}', [UserController::class, 'show'])->name('show');
+        Route::post('users/{id}', [UserController::class, 'show'])->name('viewUserBYId');
 
-        Route::post('users/{id}/events', [EventController::class, 'events'])->name('viewEventsByUserId');
+        Route::post('users/{id}/events', [UserController::class, 'findEventsbyUserId'])->name('viewEventsByUserId');
 
-        Route::get('events', [EventController::class, 'index'])->name('index');
+        Route::get('events', [EventController::class, 'index'])->name('viewAllEvents');
 
-        Route::get('events/{slug}', [EventController::class, 'slug'])->name('slug');
+        Route::get('events/{slug}', [EventController::class, 'slug'])->name('viewEventBySlug');
 
-        Route::post('events/{id}', [EventController::class, 'show'])->name('showEvent');
+        Route::post('events/{id}', [EventController::class, 'show'])->name('viewEventById');
 
         Route::get('e/{shortlink}', [EventController::class, 'redirect'])->name('redirect');
 
-        Route::post('categories/{id}', [CategoryController::class, 'show'])->name('show');
+        Route::post('categories/{id}', [CategoryController::class, 'show'])->name('showCategoryById');
 
-        Route::get('categories/{slug}', [CategoryController::class, 'slug'])->name('slug');
+        Route::get('categories/{slug}', [CategoryController::class, 'slug'])->name('showCategoryBySlug');
 
         Route::get('verifyTransaction', [PaymentController::class, 'verifyTransaction'])->name('verifyTransaction');
 

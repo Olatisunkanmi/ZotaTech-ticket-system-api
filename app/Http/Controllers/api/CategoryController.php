@@ -69,6 +69,7 @@ class CategoryController extends Controller
             // $category = 
             
             return response()->json([
+                'message' => "Category was found",
                 'data' => new CategoryResource($category),
             ], 200);
         } catch (\Throwable $th) {

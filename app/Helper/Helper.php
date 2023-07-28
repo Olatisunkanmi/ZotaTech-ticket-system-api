@@ -59,7 +59,7 @@ class Helper
      * @param int $time - time of the data
      */
 
-    public static function saveToCache(string $key, mixed $value, $time): string
+    public static function saveToCache(string $key, mixed $value, $time): mixed
     {
         return Cache::remember($key, $time, function () use ($value) {
             return $value;

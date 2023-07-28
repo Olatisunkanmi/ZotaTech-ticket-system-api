@@ -19,13 +19,20 @@ class EventController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $events = Helper::saveToCache('events', Event::latest()->paginate(), now()->addHour());
+            // $cachedEvent = Helper::saveToCache('events', Event::all(), now()->addHour());
 
+            // if ($cachedEvent) {
+            //     $events = $cachedEvent;
+            // } else {
+            //     $events = Event::latest()->paginate();
+            //     $events = Helper::saveToCache('events', $events, now()->addHour());
+            // }
 
+            $events = Event::all();
 
             return response()->json([
                 'message' => 'Events retrieved successfully',
-                'data' => EventResources::collection($events)
+                'data' => $events
             ], 200);
         } catch (\Throwable $th) {
 
