@@ -5,6 +5,11 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\Category
+ * @mixin \App\Models\Event
+ **/
+
 class CategoryResource extends JsonResource
 {
     /**
@@ -15,14 +20,14 @@ class CategoryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => strval($this->id),
+            'id' => $this->id,
             'type' => 'categories',
             'attributes' => [
                 'name' => $this->name,
             ],
             'events' => collect($this->events)->map(function ($event) {
                 return [
-                    'id' => strval($event->id),
+                    'id' => $event->id,
                     'description' => $event->description,
                     'title' => $event->title,
                     'images' => [

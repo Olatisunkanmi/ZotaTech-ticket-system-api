@@ -5,6 +5,12 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+
+/**
+ * @mixin \App\Models\Ticket
+ **/
+
+
 class TicketCollection extends ResourceCollection
 {
     /**
@@ -16,12 +22,13 @@ class TicketCollection extends ResourceCollection
     {
         //return parent::toArray($request);
       return [
-            'id' => strval($this->resource->id),
-            'event_id' => $this->resource->event_id,
-            'ticket_type' => $this->resource->ticket_type,
-            'price' => $this->resource->price,
-            'quantity' => $this->resource->quantity,
-            'available' => $this->resource->available,
+            'id' => strval($this->id),
+            'event_id' => $this->event_id,
+            'ticket_type' => $this->ticket_type,
+            'price' => $this->price,
+            'quantity' => $this->quantity,
+            'available' => $this->available,
         ];
+        
     }
 }

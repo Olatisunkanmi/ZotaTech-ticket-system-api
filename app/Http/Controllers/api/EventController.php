@@ -48,7 +48,7 @@ class EventController extends Controller
                 ], 404);
             }
 
-            $id = $data->event_id;
+            $id = (int)$data->event_id;
             $cachedEvent = Helper::getFromCache('events', $id);
 
             if ($cachedEvent) {
@@ -57,7 +57,7 @@ class EventController extends Controller
                 $event = Event::findOrFail($id);
             }
 
-            Helper::updateEventClicks($event);
+           
             Helper::updateCache('events', $event->id, $event, now()->addHour());
 
             return response()->json([

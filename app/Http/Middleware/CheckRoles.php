@@ -14,7 +14,7 @@ class CheckRoles
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle($request, Closure $next, ...$requiredScopes)
+    public function handle(Request $request, Closure $next,array ...$requiredScopes): Response
     {
         $user = $request->user();
         $userScopes = $user->token()->scopes;
