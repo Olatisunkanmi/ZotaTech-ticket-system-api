@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\{UserResources};
+use Exception;
 use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
@@ -80,8 +81,33 @@ class UserController extends Controller
                 // Retrieve the user from the database if not found in cache
                 $user = User::findOrFail($id);
             }
+            $data = $request->validated();
 
-            $user->update($request->all());
+            if ($request->has('account_number') && $request->has('bank_code')) {
+                try {
+                    //create paystack subaccount
+                    $data = [
+                        'business_name' => $request->name,
+                        'bank_code' => $request->bank_code,
+                        'account_number' => $request->account_number,
+                        'percentage_charge' => 20
+                    ];
+                    $payService = app(PaymentService::class);
+
+                    $result = $payService->createSubaccount($data);
+                    if (!is_array($result)) {
+                        throw new Exception($result->getMessage(), 1);
+                    }
+                    $data = array_merge($request->validated(), ['subaccount_code' => $result['subaccount_code']]);
+                } catch (\Throwable $th) {
+                    return response()->json([
+                        'message' => 'Problem uploading account details',
+                        'data' => $th->getMessage()
+                    ], 302);
+                }
+            }
+
+            $user->update($data);
             Helper::updateCache('users', $id, $user, now()->addHour(1));
 
 

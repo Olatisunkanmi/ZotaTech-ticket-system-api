@@ -5,6 +5,13 @@ use GuzzleHttp\Client;
 
 class PaymentService {
 
+    public function createSubaccount(array $data) :mixed
+    {
+        $url = '/subaccount';
+        
+        $response = $this->hitPaystack('POST', $url, $data);
+        return $response;
+    }
 
     public function initializeTransaction(array $data) : mixed
     {

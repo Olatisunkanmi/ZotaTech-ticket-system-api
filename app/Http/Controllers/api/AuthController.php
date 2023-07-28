@@ -10,6 +10,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\{Hash, Cache};
 use App\Http\Requests\{SignUpRequest, LoginRequest, ForgotPasswordRequest};
 use Symfony\Component\HttpFoundation\Response;
+use App\Services\PaymentService;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -39,11 +41,36 @@ class AuthController extends Controller
 
     public function register(SignUpRequest $request): JsonResponse
     {
+        $data = $request->validated();
+
+        if ($request->has('account_number') && $request->has('bank_code')) {
+            try {
+                //create paystack subaccount
+                $data = [
+                    'business_name' => $request->name,
+                    'bank_code' => $request->bank_code,
+                    'account_number' => $request->account_number,
+                    'percentage_charge' => 20
+                ];
+                $payService = app(PaymentService::class);
+
+                $result = $payService->createSubaccount($data);
+                if (!is_array($result)) {
+                    throw new Exception($result->getMessage(), 1);
+                }
+                $data = array_merge($request->validated(), ['subaccount_code' => $result['subaccount_code']]);
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'message' => 'Problem uploading account details',
+                    'data' => $th->getMessage()
+                ], 302);
+            }
+        }
+
         // Logic for handling user registration
-        $user = User::create($request->validated());
+        $user = User::create($data);
 
         event(new GuestSignup($user)); // @phpstan-ignore-line
-
 
         return response()->json([
             'message' => 'User created successfully',
