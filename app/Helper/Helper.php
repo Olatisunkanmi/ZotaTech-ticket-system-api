@@ -3,19 +3,20 @@
 namespace App\Helper;
 
 use Illuminate\Support\Str;
+use App\Models\{Event, Url, Category};
 use Illuminate\Support\Facades\{Http, Cache};
 
 
 class Helper
 {
 
-    public static function getDomain()
+    public static function getDomain(): string
     {
         $domain = $_SERVER['HTTP_HOST'];
         return $domain;
     }
 
-    public static  function generateLink(string $title)
+    public static function generateLink(string $title): array
     {
         $ulid = Str::ulid();
         $array = explode(' ', $title);
@@ -34,7 +35,7 @@ class Helper
         ];
     }
 
-    public static function getRandomImage()
+    public static function getRandomImage(): ?string
     {
         $response = Http::get('https://robohash.org/' . Str::random(10));
 
@@ -55,10 +56,10 @@ class Helper
      * Save data to cache
      * @param string $key - key of the data
      * @param string $value - value of the data
-     * @param string $time - time of the data
+     * @param int $time - time of the data
      */
 
-    public static function saveToCache($key, $value, $time)
+    public static function saveToCache(string $key, mixed $value, $time): mixed
     {
         return Cache::remember($key, $time, function () use ($value) {
             return $value;
@@ -71,7 +72,7 @@ class Helper
      * @param string $id - id of the data
      */
 
-    public static function getFromCache($key, $id)
+    public static function getFromCache($key, $id): mixed
     {
         return Cache::get($key . $id);
     }
@@ -81,7 +82,7 @@ class Helper
      * @param string $key - key of the data
      * @param string $id - id of the data
      */
-    public static function deleteFromCache($key, $id)
+    public static function deleteFromCache($key, $id): bool
     {
         return Cache::forget($key . $id);
     }
@@ -91,7 +92,7 @@ class Helper
      * @param string $key - key of the data
      */
 
-    public static function deleteAllFromCache($key)
+    public static function deleteAllFromCache($key): bool
     {
         return Cache::forget($key);
     }
@@ -105,15 +106,7 @@ class Helper
      * @param string $time - time of the data
      */
 
-    public static function updateCache($key, $id, $value, $time)
-    {
-        return  Cache([$key . $id => $value], $time);
-    }
-
-    /**
-     * Update Url clicks in cache
-     */
-    public static function updateEventClicksInCache($key, $id, $value, $time)
+    public static function updateCache($key, $id, $value, $time): mixed
     {
         return  Cache([$key . $id => $value], $time);
     }
@@ -121,15 +114,14 @@ class Helper
     /**
      * Update Event clicks in DB
      */
-    public static function updateEventClicks($event)
+    public static function updateEventClicks(object $event): void
     {
         $url = $event->url;
         $url->clicks = $url->clicks + 1;
         $url->save();
-        // return $url;
     }
 
-    public static function generateToken()
+    public static function generateToken(): string
     {
         return Str::random(6);
     }

@@ -1,19 +1,17 @@
 <?php
 
 namespace App\Http\Resources;
-
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Http\Request;
+use App\Models\Event; // Make sure to import the Event model if not already imported
 use Illuminate\Http\Resources\Json\JsonResource;
+
+/**
+ * @mixin \App\Models\Event
+ **/
 
 class EventResources extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
+   
+    public function toArray($request): array
     {
         return [
             'id' => $this->id,
@@ -21,13 +19,13 @@ class EventResources extends JsonResource
             'attributes' => [
                 'title' => $this->title,
                 'description' => $this->description,
+                'category' => $this->category,
                 'image' => [
                     'file_name' => $this->image->file_name,
-                    'mine_type' => $this->image->mime_type,
+                    'mime_type' => $this->image->mime_type,
                     'file_size' => $this->image->size,
                     'image_url' => $this->image->original_url,
                 ],
-                'date' => $this->date,
                 'time' => $this->time,
                 'type' => $this->type,
                 'price' => $this->price,
@@ -37,8 +35,8 @@ class EventResources extends JsonResource
                 'start_date' => $this->start_date,
                 'end_date' => $this->end_date,
                 'user_id' => $this->user_id,
-            ],  
-                'url' => $this->url,
+            ],
+            'url' => $this->url,
         ];
     }
 }

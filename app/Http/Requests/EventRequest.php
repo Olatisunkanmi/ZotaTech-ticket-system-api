@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EventRequest extends FormRequest
@@ -26,12 +27,12 @@ class EventRequest extends FormRequest
             'title' => 'required|string',
             'description' => 'required|string',
             'location' => 'required|string',
+            'category' => 'required|string|exists:App\Models\Category,name',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'type' => 'required|string',
             'capacity' => 'required|integer',
             'available_seats' => 'nullable|integer',
             'price' => 'nullable|integer',
-            // 'user_id' => 'nullable|integer',
             'start_date' => 'required|string',
             'end_date' => 'required|string',
             'time' => 'required|string',

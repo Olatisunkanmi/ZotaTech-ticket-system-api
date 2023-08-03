@@ -15,16 +15,16 @@ class UserController extends Controller
 
     /**
      * Get all users.
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
         try {
             //code...
-            $users = Helper::saveToCache('users', User::all(), now()->addHour(1));
+            $users = Helper::saveToCache('users', User::all(), now()->addHour());
 
             return response()->json([
-                'message' => 'User index',
+                'message' => 'Retrieved successfully',
                 'data' => $users
             ], 200);
         } catch (\Throwable $th) {
@@ -37,23 +37,23 @@ class UserController extends Controller
     /**
      * Get a specific user.
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show(string $id)
     {
         try {
             //code...
-            $user = Helper::getFromCache('users', $id);
+            $user = Helper::getFromCache('user', $id);
 
 
             if (!$user) {
                 $user = User::findOrFail($id);
-                $user = Helper::saveToCache('users', $id, now()->addHour(1));
+                $user = Helper::saveToCache('users', $id, now()->addHour());
             }
 
             return response()->json([
-                'message' => 'User show',
-                'data' => new UserResources($user)
+                'message' => 'User Found',
+                'data' => $user
             ], 200);
         } catch (\Throwable $th) {
             //throw $th;
@@ -67,9 +67,9 @@ class UserController extends Controller
      * Update the specified user in storage.
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, string $id)
     {
         try {
             // Retrieve the user from the cache if available
@@ -124,9 +124,9 @@ class UserController extends Controller
     /**
      * Remove the specified user from storage.
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
         try {
             //code...
@@ -149,6 +149,25 @@ class UserController extends Controller
         } catch (\Throwable $th) {
             //throw $th;
 
+            return response()->json(['message' => 'User not found'], 404);
+        }
+    }
+
+    public function getEvents(string $id)
+    {
+        try {
+            //code...
+
+            $user = User::findOrFail($id);
+            $events = $user->events;
+
+            return response()->json([
+                'message' => 'Retrieved successfully',
+                'data' => $events
+            ], 200);
+
+        } catch (\Throwable $th) {
+            //throw $th;
             return response()->json(['message' => 'User not found'], 404);
         }
     }

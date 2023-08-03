@@ -57,14 +57,6 @@ class User extends Authenticatable implements HasMedia
         'confirm_password' => 'hashed'
     ];
 
-
-    public function image(): Attribute 
-    {
-        // return $this->getFirstMediaUrl('profile');
-
-        return Attribute::make(get: fn () => $this->getFirstMediaUrl('profile')? : 'https://ui-avatars.com/api/?name=' . $this->name . '&color=7F9CF5&background=EBF4FF' ) ;
-    }
-
     /**
      * Get the events for the user.
      */
@@ -73,18 +65,12 @@ class User extends Authenticatable implements HasMedia
         return $this->hasMany(Event::class);
     }
 
-    public function getEvents(): Attribute
-    {
-        return Attribute::make(get: fn () => User::events()->get());
-    }
-
-
 
     /**
      * Generate a role based token for the user
      * 
      */
-    public function generateUserRole()
+    public function generateUserRole(): string
     {
         $role = [];
 

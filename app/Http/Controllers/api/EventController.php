@@ -3,38 +3,46 @@
 namespace App\Http\Controllers\api;
 
 use App\Helper\Helper;
-use App\Models\{Event, Url};
+use App\Models\{Event, Url, Category};
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\EventResources;
 use App\Http\Requests\EventRequest;
+use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\{Auth, Cache};
+use Illuminate\Support\Js;
 
 class EventController extends Controller
 {
-    /**
-     * Get all events.
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index()
+    
+    public function index(): JsonResponse
     {
         try {
-            $events = Helper::saveToCache('events', Event::latest()->paginate(), now()->addHour(1));
+            // $cachedEvent = Helper::saveToCache('events', Event::all(), now()->addHour());
 
+            // if ($cachedEvent) {
+            //     $events = $cachedEvent;
+            // } else {
+            //     $events = Event::latest()->paginate();
+            //     $events = Helper::saveToCache('events', $events, now()->addHour());
+            // }
 
+            $events = Event::all();
 
             return response()->json([
                 'message' => 'Events retrieved successfully',
-                'data' => EventResources::collection($events)
+                'data' => $events
             ], 200);
         } catch (\Throwable $th) {
 
-            return response()->json(['message' => 'Events not found'], 404);
+            return response()->json([
+                'message' => 'Events not found'
+            ], 404);
         }
     }
 
-    public function slug(string $slug)
+    public function slug(string $slug): JsonResponse
     {
         try {
             //code...
@@ -42,10 +50,12 @@ class EventController extends Controller
             $data = Url::where('short_id', $url_id)->first();
 
             if (!$data) {
-                return response()->json(['message' => 'Event not found'], 404);
+                return response()->json([
+                    'message' => 'Event not found'
+                ], 404);
             }
 
-            $id = $data->event_id;
+            $id = (int)$data->event_id;
             $cachedEvent = Helper::getFromCache('events', $id);
 
             if ($cachedEvent) {
@@ -54,8 +64,8 @@ class EventController extends Controller
                 $event = Event::findOrFail($id);
             }
 
-            Helper::updateEventClicks($event);
-            Helper::updateCache('events', $event->id, $event, now()->addHour(1));
+           
+            Helper::updateCache('events', $event->id, $event, now()->addHour());
 
             return response()->json([
                 'message' => 'Event retrieved successfully',
@@ -63,18 +73,14 @@ class EventController extends Controller
             ], 200);
         } catch (\Throwable $th) {
             //throw $th;
-            return response()->json(['message' => 'Event not found'], 404);
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         }
     }
 
 
-    /**
-     * Get a specific event.
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
-     */
-
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
         try {
             $cachedEvent = Helper::getFromCache('events', $id);
@@ -83,28 +89,25 @@ class EventController extends Controller
                 $event = $cachedEvent;
             } else {
                 $event = Event::findOrFail($id);
-                $event = Helper::saveToCache('events' . $event->id, $event, now()->addHour(1));
+                $event = Helper::saveToCache('events' . $event->id, $event, now()->addHour());
             }
 
             Helper::updateEventClicks($event);
-            Helper::updateCache('events', $event->id, $event, now()->addHour(1));
+            Helper::updateCache('events', $event->id, $event, now()->addHour());
 
             return response()->json([
                 'message' => 'Event retrieved successfully',
                 'data' => new EventResources($event)
             ], 200);
         } catch (\Throwable $th) {
-            //throw $th;
-            return response()->json(['message' => 'Event not found'], 404);
+
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         }
     }
-    /**
-     * Create a new event.
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-
-    public function store(EventRequest $request)
+   
+    public function store(EventRequest $request): JsonResponse
     {
         $user =auth()->user();
         if($user->subaccount_code == null){
@@ -124,31 +127,23 @@ class EventController extends Controller
         ], 201);
     }
 
-    /**
-     * Redirect to the specified event.
-     * @param  string  $short_id
-     * @return \Illuminate\Http\Response
-     */
+   
 
-    public function redirect($short_id)
+    public function redirect($short_id): JsonResponse
     {
         $url = Url::where('short_id', $short_id)->first();
 
         if (!$url) {
-            return response()->json(['message' => 'Url not found'], 404);
+            return response()->json([
+                'message' => 'Url not found'
+            ], 404);
         }
 
         return redirect($url->long_url);
     }
 
-    /**
-     * Update the specified event in storage.
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
-     */
-
-    public function update(Request $request, string $id)
+    
+    public function update(Request $request, string $id): JsonResponse
     {
         try {
             //code...
@@ -161,7 +156,7 @@ class EventController extends Controller
             }
 
             $event->update($request->all());
-            Helper::updateCache('events', $id, $event, now()->addHour(1));
+            Helper::updateCache('events', $id, $event, now()->addHour());
 
 
             return response()->json([
@@ -170,18 +165,15 @@ class EventController extends Controller
             ], 201);
         } catch (\Throwable $th) {
             //throw $th;
-            return response()->json(['message' => 'Event not found'], 404);
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         }
     }
 
 
-    /**
-     * Remove the specified event from storage.
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
-     */
-
-    public function destroy(string $id)
+  
+    public function destroy(string $id): JsonResponse
     {
         try {
             //code...
@@ -199,39 +191,15 @@ class EventController extends Controller
                 }
             }
 
-            return response()->json(['message' => 'Event deleted successfully'], 200);
+            return response()->json([
+                'message' => 'Event deleted successfully'
+            ], 200);
         } catch (\Throwable $th) {
             //throw $th;
 
-            return response()->json(['message' => 'Event not found'], 404);
+            return response()->json([
+                'message' => 'Event not found'
+            ], 404);
         }
     }
-
-    public function searchEvents(Request $request) 
-    {
-        $event = Event::query();
-
-        if ($request->has('description')) {
-            $description = $request->input('description');
-            $event->where('description', 'like', '%' .$description. '%');
-        }
-
-        if ($request->has('location')) {
-            $location = $request->input('location');
-            $event->where('location', 'like', '%' .$location. '%');
-        }
-
-        if ($request->has('category')) {
-            $category = $request->input('category');
-            $event->where('category', 'like', '%' .$category. '%');
-        }
-
-        $filteredEvents = $event->get();
-
-        return response()->json([
-            'message' => 'Searched events listed successfully',
-            'data' => EventResources::collection($filteredEvents)
-        ]);
-    }
-
 }

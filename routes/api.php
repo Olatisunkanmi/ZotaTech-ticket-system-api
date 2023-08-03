@@ -2,8 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\{AuthController, UserController, EventController, PaymentController, RedirectController,TicketController}
-;
+use App\Http\Controllers\api\{AuthController, UserController, EventController, PaymentController, RedirectController, TicketController, CategoryController, OrderController};
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
 
@@ -26,9 +25,6 @@ Route::prefix('v1')->group(function () {
         return response()->json(['message' => 'Welcome to Open Tickets Apis'], 200);
     })->name('welcome');
 
-    
-
-   
 
 
     // Declare unauthenticated routes
@@ -41,20 +37,25 @@ Route::prefix('v1')->group(function () {
 
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-        Route::post('users/{id}', [UserController::class, 'show'])->name('show');
+        Route::post('users/{id}', [UserController::class, 'show'])->name('viewUserBYId');
 
-        Route::get('events', [EventController::class, 'index'])->name('index');
+        Route::post('users/{id}/events', [UserController::class, 'findEventsbyUserId'])->name('viewEventsByUserId');
 
-        Route::get('events/{slug}', [EventController::class, 'slug'])->name('slug');
+        Route::get('events', [EventController::class, 'index'])->name('viewAllEvents');
 
-        Route::post('events/{id}', [EventController::class, 'show'])->name('showEvent');
+        Route::get('events/{slug}', [EventController::class, 'slug'])->name('viewEventBySlug');
+
+        Route::post('events/{id}', [EventController::class, 'show'])->name('viewEventById');
 
         Route::get('e/{shortlink}', [EventController::class, 'redirect'])->name('redirect');
+
+        Route::post('categories/{id}', [CategoryController::class, 'show'])->name('showCategoryById');
+
+        Route::get('categories/{slug}', [CategoryController::class, 'slug'])->name('showCategoryBySlug');
 
         Route::get('verifyTransaction', [PaymentController::class, 'verifyTransaction'])->name('verifyTransaction');
 
         Route::get('tickets/{id}', [TicketController::class, 'show']);
-
         Route::get('search/events/filter', [EventController::class, 'searchEvents'])->name('searchEvent');
 
         Route::get('search/tickets/filter', [TicketController::class, 'searchTickets'])->name('searchTicket'); 
@@ -78,15 +79,18 @@ Route::prefix('v1')->group(function () {
 
             Route::apiResource('events', EventController::class)->except(['show', 'slug', 'redirect']);
 
+            Route::apiResource('categories', CategoryController::class);
+            Route::post('categories/{id}', [CategoryController::class, 'show'])->name('show');
+
             Route::get('/tickets', [TicketController::class, 'index']);
         });
 
 
         //Events routes
-        Route::prefix('events')->group(function (){
+        Route::prefix('events')->group(function () {
             Route::post('/', [EventController::class, 'store'])->name('store');
 
-            
+
             Route::group(['middleware' => 'isOwner'], function () {
                 Route::put('/{id}', [EventController::class, 'update'])->name('updateTicket');
                 Route::delete('/{id}', [EventController::class, 'destroy'])->name('destroyTicket');
@@ -95,26 +99,17 @@ Route::prefix('v1')->group(function () {
 
         //Tickets Route
         Route::prefix('tickets')->group(function (){
-            Route::post('/', [TicketController::class, 'store'])->name('storeTicket');
+            Route::post('/', [TicketController::class, 'store'])->name('store');
             Route::post('pay', [PaymentController::class, 'makePayment'])->name('pay');
 
-            
+
             Route::group(['middleware' => 'ticketOwner'], function () {
                 Route::put('/{id}', [TicketController::class, 'update'])->name('update');
                 Route::delete('/{id}', [TicketController::class, 'destroy'])->name('destroy');
             });
         });
         
-        //Tickets Routes
-    //Route to Create a new ticket for an event.
-    /*Route::post('/events/{event}/tickets', [TicketController::class, 'store'])->name('store');
-    
-    //Route to show that a ticket belongs to a specific event or Retrieve details of a specific ticket of an event.
-    Route::get('/events/{event}/tickets/{ticket}', [TicketController::class, 'validateEventTicket'])->name('validateEventTicket');
-    // Route to Update details of a specific ticket of an event.
-    Route::put('/events/{event}/tickets/{ticket}', [TicketController::class, 'updatespecificticket'])->name('updateSpecificTicket');
-    //Route to Delete a specific ticket.
-    Route::delete('/events/{event}/tickets/{ticket}', [TicketController::class, 'deleteSpecificTicket'])->name('deleteSpecificTicket');
-    */
+        //Search routes
+  
     });
 });
