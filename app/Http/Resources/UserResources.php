@@ -26,6 +26,14 @@ class UserResources extends JsonResource
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
             ],
+            'profile_picture' => $this->getFirstMediaUrl('avatars')
+            // 'profile_picture' => $this->profile_picture
+            // 'profile_picture' => [
+            //     'picture' => $this->profile_picture->file_name,
+            //     'mime_type' => $this->profile_picture->mime_type,
+            //     'size' => $this->profile_picture->size,
+            //     'original_url' => $this->profile_picture->original_url
+            // ]
             // 'events' => collect($this->events)->map(function ($event) {
             //     return new EventResources($event);
             // }),

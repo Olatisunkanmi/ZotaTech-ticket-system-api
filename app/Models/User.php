@@ -32,7 +32,8 @@ class User extends Authenticatable implements HasMedia
         'email',
         'password',
         'confirm_password',
-        'subaccount_code'
+        'subaccount_code',
+        'profile_picture'
     ];
 
     /**
@@ -81,5 +82,15 @@ class User extends Authenticatable implements HasMedia
         }
 
         return $this->createToken($this->email, $role)->accessToken;
+    }
+
+    // public function registerMediaCollection(): void
+    // {
+    //     $this->addMediaCollection('profile_picture');
+    // }
+
+    public function profile_picture(): Attribute
+    {
+        return Attribute::make(get: fn () => $this->getFirstMedia('profile_picture') ?: null);
     }
 }
