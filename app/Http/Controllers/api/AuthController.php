@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Events\GuestSignup;
-use App\Helper\Helper;
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\{Hash, Cache};
-use App\Http\Requests\{SignUpRequest, LoginRequest, ForgotPasswordRequest};
-use Symfony\Component\HttpFoundation\Response;
-use App\Services\PaymentService;
 use Exception;
+use App\Models\User;
+use App\Helper\Helper;
+use App\Events\GuestSignup;
+use App\Services\PaymentService;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResources;
+use Illuminate\Support\Facades\{Hash, Cache};
+use Symfony\Component\HttpFoundation\Response;
+use App\Http\Requests\{SignUpRequest, LoginRequest, ForgotPasswordRequest};
 
 class AuthController extends Controller
 {
@@ -72,11 +73,17 @@ class AuthController extends Controller
         // Logic for handling user registration
         $user = User::create($data);
 
+        if ($request->hasFile('profile_picture')) {
+            $user->addMediaFromRequest('profile_picture')->toMediaCollection('avatars', 'avatars');
+        }
+
+        // dd($user->profile_picture);
         event(new GuestSignup($user)); // @phpstan-ignore-line
+
 
         return response()->json([
             'message' => 'User created successfully',
-            'user' => $user
+            'user' => new UserResources($user)
         ], Response::HTTP_CREATED);
     }
 

@@ -107,7 +107,14 @@ class UserController extends Controller
                 }
             }
 
-            $user->update($data);
+            $user->update($data->except('profile_picture'));
+
+            if ($request->hasFile('profile_picture')) {
+                $user->clearMediaCollection('avatar');
+                $user->addMediaFromRequest('profile_picture')->toMediaCollection('avatars');
+                $user->save();
+            };
+
             Helper::updateCache('users', $id, $user, now()->addHour(1));
 
 
