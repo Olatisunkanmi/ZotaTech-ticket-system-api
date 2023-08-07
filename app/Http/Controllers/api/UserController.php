@@ -110,7 +110,7 @@ class UserController extends Controller
             $user->update($data->except('profile_picture'));
 
             if ($request->hasFile('profile_picture')) {
-                $user->clearMediaCollection('avatar');
+                $user->clearMediaCollection('avatars');
                 $user->addMediaFromRequest('profile_picture')->toMediaCollection('avatars');
                 $user->save();
             };
